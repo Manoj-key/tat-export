@@ -18,7 +18,10 @@
     param: 'Rows shown',            // parameter that caps how many rows the worksheet returns
     paramAll: '10000000',           // its "all rows" value
     allRows: 'true',                // default state of the "All rows" checkbox
-    pageSize: '100'
+    pageSize: '100',
+    // Tableau's summary data hands columns back as dimensions A-Z then measures, NOT in the worksheet's shelf order.
+    // This is the order we want left to right; anything not listed keeps its place after the listed ones.
+    columns: 'WO, Product Name, Product Description, Product Category, Deliverable Services, Service Level Clean, Ship to Service Account, WDF Region, WDF Hub, WDB Region, WDB Hub, Transhipment, RTK/RTF, SOT, Status, Net TAT (Days), Target TAT (Days), Parts Delay, WO Delay Reason, Fiscal Year, Display Quarter, WO Created Date, WO Received Date, WO Closed Date'
   };
 
   // ---------------------------------------------------------------- pure helpers
@@ -59,6 +62,15 @@
       if (seen[name]) return;                       // the text-mark duplicate of a measure, etc.
       seen[name] = true; keep.push(i); header.push(name);
     });
+    // put the columns in the requested left-to-right order; unlisted ones keep their relative place, after the listed ones
+    var want = (opts.columns === undefined ? DEFAULTS.columns : opts.columns).split(',')
+                 .map(function (s) { return s.trim().toLowerCase(); }).filter(Boolean);
+    if (want.length) {
+      var ranked = header.map(function (h, i) { var p = want.indexOf(h.toLowerCase()); return [p < 0 ? want.length + i : p, i]; });
+      ranked.sort(function (a, b) { return a[0] - b[0] || a[1] - b[1]; });
+      keep = ranked.map(function (r) { return keep[r[1]]; });
+      header = ranked.map(function (r) { return header[r[1]]; });
+    }
     var dateFmt = opts.dateFormat || DEFAULTS.dateFormat, dtFmt = opts.dateTimeFormat || DEFAULTS.dateTimeFormat;
     var types = keep.map(function (i) { return columns[i].dataType; });
     var cells = new Array(rows.length), display = new Array(rows.length), sortKeys = new Array(rows.length);
@@ -181,7 +193,7 @@
   // ================================================================ browser / Tableau side
   var $ = function (id) { return document.getElementById(id); };
   var cfg = {}, S = { shaped: null, filters: [], search: '', sortCol: -1, sortDir: 0, page: 1, pageSize: 100,
-                      view: [], bounds: [], busy: false, suppress: false, sheet: null };
+                      view: [], bounds: [], busy: false, suppress: false, sheet: null, cap: 0, capLabel: '' };
 
   function setting(k) { var v = tableau.extensions.settings.get(k); return (v === undefined || v === null || v === '') ? DEFAULTS[k] : v; }
   function status(msg, kind) { var el = $('status'); el.textContent = msg || ''; el.className = kind || ''; }
@@ -334,8 +346,14 @@
     $('first').disabled = $('prev').disabled = S.busy || S.page <= 1;
     $('next').disabled = $('last').disabled = S.busy || S.page >= pages;
     var total = S.shaped ? S.shaped.display.length : 0;
-    $('count').innerHTML = S.view.length === total ? '<b>' + total.toLocaleString() + '</b> rows'
-                                                   : '<b>' + S.view.length.toLocaleString() + '</b> of ' + total.toLocaleString() + ' rows';
+    var atCap = S.cap > 0 && total >= S.cap;
+    $('count').innerHTML = (S.view.length === total ? '<b>' + total.toLocaleString() + '</b> rows'
+                                                    : '<b>' + S.view.length.toLocaleString() + '</b> of ' + total.toLocaleString() + ' rows')
+                         + (atCap ? ' <span class="cap">limit reached</span>' : '');
+    $('count').title = total.toLocaleString() + ' row' + (total === 1 ? '' : 's') + ' loaded from "' + cfg.sheet
+                     + '" with the dashboard filters as they are now'
+                     + (S.capLabel ? '\n"' + cfg.param + '" is set to ' + S.capLabel
+                                   + (atCap ? ' - there may be more rows than this' : ' - this is everything those filters return') : '');
     var active = S.search || S.filters.some(function (f) { return f.text || f.from !== null && f.from !== undefined || f.to !== null && f.to !== undefined; });
     $('clear').hidden = !active;
   }
@@ -346,11 +364,23 @@
   }
 
   // ---------------------------------------------------------------- load + events
+  // what "Rows shown" is set to right now, so the row count can say whether it is the limiter
+  function readCap() {
+    try {
+      return tableau.extensions.dashboardContent.dashboard.findParameterAsync(cfg.param).then(function (p) {
+        var v = p && p.currentValue;
+        S.cap = v && !isNaN(Number(v.value)) ? Number(v.value) : 0;
+        S.capLabel = v ? (v.formattedValue || String(v.value)) : '';
+      }, function () { S.cap = 0; S.capLabel = ''; });
+    } catch (e) { S.cap = 0; S.capLabel = ''; return Promise.resolve(); }
+  }
+
   function load(first) {
     if (S.busy) return Promise.resolve();
     var keep = $('status').className === 'ok' ? $('status').textContent : null;   // don't wipe an export confirmation
     busy(true); status('Reading rows…', 'warn');
-    return readAll(S.sheet, function (n, t) { status('Reading rows… ' + n.toLocaleString() + (t ? ' of ' + t.toLocaleString() : ''), 'warn'); })
+    return readCap()
+      .then(function () { return readAll(S.sheet, function (n, t) { status('Reading rows… ' + n.toLocaleString() + (t ? ' of ' + t.toLocaleString() : ''), 'warn'); }); })
       .then(function (data) {
         var was = S.shaped ? S.shaped.header.join('') : null;
         S.shaped = shape(data.columns, data.rows, cfg);
