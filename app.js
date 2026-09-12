@@ -24,6 +24,9 @@
     previewRows: '1000',            // preview size: the cap the page opens on ('0'/paramAll = no cap)
     sortBy: 'Net TAT (Days)',       // column the table opens sorted on ('' = the order Tableau returns)
     sortDir: 'desc',
+    totalsSheet: 'Raw Data Totals', // one-mark worksheet: COUNTD(WO) + MIN/MAX of each date, uncapped.  It is what
+                                    // lets the count say "1,000 of 12,345" and the sliders span the WHOLE filtered
+                                    // range instead of just the preview.  '' = fall back to the preview's own span.
     // Tableau's summary data hands columns back as dimensions A-Z then measures, NOT in the worksheet's shelf order.
     // This is the order we want left to right; anything not listed keeps its place after the listed ones.
     columns: 'WO, WDF, WDB, WDF Region, WDB Region, SOT, KC Level, RTK/RTF, Service Type, WO Received Date, Asset Name, Serial Number, Product Line, WO Completed Date, Is Rerepair, Total Transit Time (Days), SACI Upgrade, Product Name, Asset Manufacturer, On Hold Time (Hours), Target TAT (Days), Scheduled Date, Ship to Service Account, Deliverable Services, Workcenter Calibration, Workcenter Repair, Parent Work Order, Net TAT (Days), WDB Country, WDF Country, WDB TAT (Days), WO Delay Reason, Requested Date, Status, Product Description, Product Category, Fiscal Year, Display Quarter, WO Closed Date'
@@ -198,7 +201,7 @@
   // ================================================================ browser / Tableau side
   var $ = function (id) { return document.getElementById(id); };
   var cfg = {}, S = { shaped: null, filters: [], search: '', sortCol: -1, sortDir: 0, page: 1, pageSize: 100,
-                      view: [], bounds: [], busy: false, suppress: false, sheet: null, total: 0, preview: 1000, sorted: false };
+                      view: [], bounds: [], busy: false, suppress: false, sheet: null, total: 0, preview: 1000, sorted: false, totals: null, span: {} };
 
   function setting(k) { var v = tableau.extensions.settings.get(k); return (v === undefined || v === null || v === '') ? DEFAULTS[k] : v; }
   function status(msg, kind) { var el = $('status'); el.textContent = msg || ''; el.className = kind || ''; }
@@ -241,6 +244,36 @@
       });
     });
   }
+  /** the uncapped one-mark worksheet: {CNTD(WO): n, MIN(WO Received Date): …, MAX(…): …} */
+  function readTotals() {
+    if (!cfg.totalsSheet) return Promise.resolve(null);
+    var ws = null, all = tableau.extensions.dashboardContent.dashboard.worksheets;
+    for (var i = 0; i < all.length; i++) if (all[i].name === cfg.totalsSheet) ws = all[i];
+    if (!ws) return Promise.resolve(null);
+    return ws.getSummaryDataAsync({ ignoreSelection: true, maxRows: 1 }).then(function (t) {
+      if (!t.data.length) return null;
+      var out = {};
+      t.columns.forEach(function (c) { out[c.fieldName] = t.data[0][c.index]; });
+      return out;
+    }, function () { return null; });
+  }
+  var COUNT_RE = /^(CNTD|COUNTD)\(/i;
+  function totalRows(tot) {
+    for (var k in tot) if (COUNT_RE.test(k)) { var n = Number(tot[k].value); if (!isNaN(n)) return n; }
+    return 0;
+  }
+  /** full-range [lo, hi] serials for a column heading, from the totals sheet */
+  function totalSpan(tot, header) {
+    var out = {};
+    header.forEach(function (h) {
+      var lo = tot['MIN(' + h + ')'], hi = tot['MAX(' + h + ')'];
+      if (!lo || !hi || isNull(lo) || isNull(hi)) return;
+      var a = toSerial(lo.value, lo.nativeValue), b = toSerial(hi.value, hi.nativeValue);
+      if (a !== null && b !== null) out[h] = { lo: Math.floor(Math.min(a, b)), hi: Math.floor(Math.max(a, b)) };
+    });
+    return out;
+  }
+
   function countRows(sheet) {
     if (typeof sheet.getSummaryDataReaderAsync !== 'function') return Promise.resolve(null);
     return sheet.getSummaryDataReaderAsync(1, { ignoreSelection: true })
@@ -305,9 +338,12 @@
   }
 
   // ---------------------------------------------------------------- rendering
-  function bounds(shaped) {
+  function bounds(shaped, span) {
+    span = span || {};
     return shaped.types.map(function (t, c) {
       if (!isDate(t)) return null;
+      var full = span[shaped.header[c]];
+      if (full) return full;                       // the whole filtered range, not just what the preview loaded
       var lo = null, hi = null;
       for (var r = 0; r < shaped.sortKeys.length; r++) {
         var v = shaped.sortKeys[r][c]; if (v === null) continue;
@@ -359,16 +395,15 @@
     $('first').disabled = $('prev').disabled = S.busy || S.page <= 1;
     $('next').disabled = $('last').disabled = S.busy || S.page >= pages;
     var loaded = S.shaped ? S.shaped.display.length : 0;
-    var capped = S.preview > 0 && S.preview < Number(cfg.paramAll || Infinity) && loaded >= S.preview;
-    $('count').innerHTML = (S.view.length === loaded ? '<b>' + loaded.toLocaleString() + '</b> rows'
-                                                     : '<b>' + S.view.length.toLocaleString() + '</b> of ' + loaded.toLocaleString() + ' rows')
-                         + (capped && cfg.sortBy ? ' <span class="cap">top ' + loaded.toLocaleString() + ' by ' + esc(cfg.sortBy) + '</span>'
-                                                 : capped ? ' <span class="cap">preview</span>' : '');
-    $('count').title = capped
-      ? 'Showing the ' + loaded.toLocaleString() + ' work orders with the largest ' + (cfg.sortBy || 'value')
-        + ' out of everything your dashboard filters return.\nPick a bigger Preview size to browse more.\n'
-        + 'The export is not limited by this: with "All rows" ticked you get every row your filters return.'
-      : loaded.toLocaleString() + ' row' + (loaded === 1 ? '' : 's') + ' - everything the dashboard filters return.';
+    var all = Math.max(S.total || 0, loaded), shown = S.view.length;
+    var n = shown === loaded ? loaded : shown;                 // what is on screen right now
+    $('count').innerHTML = all > n ? '<b>' + n.toLocaleString() + '</b> of ' + all.toLocaleString() + ' rows'
+                                   : '<b>' + n.toLocaleString() + '</b> rows';
+    $('count').title = all > loaded
+      ? loaded.toLocaleString() + ' of ' + all.toLocaleString() + ' rows loaded, the ones with the largest '
+        + (cfg.sortBy || 'value') + '.\nPick a bigger Preview size to load more.\n'
+        + 'The export is not limited by this: with "All rows" ticked you get all ' + all.toLocaleString() + '.'
+      : all.toLocaleString() + ' row' + (all === 1 ? '' : 's') + ' - everything the dashboard filters return.';
     var active = S.search || S.filters.some(function (f) { return f.text || f.from !== null && f.from !== undefined || f.to !== null && f.to !== undefined; });
     $('clear').hidden = !active;
   }
@@ -404,12 +439,13 @@
     if (S.busy) return Promise.resolve();
     var keep = $('status').className === 'ok' ? $('status').textContent : null;   // don't wipe an export confirmation
     busy(true); status('Reading rows…', 'warn');
-    return readAll(S.sheet, S.preview >= Number(cfg.paramAll || Infinity) ? 0 : S.preview, function (n, t) { status('Reading rows… ' + n.toLocaleString() + (t ? ' of ' + t.toLocaleString() : ''), 'warn'); })
+    return readTotals().then(function (tot) { S.totals = tot; return readAll(S.sheet, S.preview >= Number(cfg.paramAll || Infinity) ? 0 : S.preview, function (n, t) { status('Reading rows… ' + n.toLocaleString() + (t ? ' of ' + t.toLocaleString() : ''), 'warn'); }); })
       .then(function (data) {
         var was = S.shaped ? S.shaped.header.join('') : null;
-        S.total = data.total === undefined ? data.rows.length : data.total;
         S.shaped = shape(data.columns, data.rows, cfg);
-        S.bounds = bounds(S.shaped);
+        S.span = S.totals ? totalSpan(S.totals, S.shaped.header) : {};
+        S.total = (S.totals && totalRows(S.totals)) || (data.total === undefined ? data.rows.length : data.total);
+        S.bounds = bounds(S.shaped, S.span);
         if (was !== S.shaped.header.join('')) {                 // columns changed -> fresh filters
           S.filters = S.shaped.header.map(function () { return { text: '', from: null, to: null }; });
           S.sortCol = -1; S.sortDir = 0;
