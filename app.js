@@ -24,9 +24,10 @@
     previewRows: '1000',            // preview size: the cap the page opens on ('0'/paramAll = no cap)
     sortBy: 'Net TAT (Days)',       // column the table opens sorted on ('' = the order Tableau returns)
     sortDir: 'desc',
-    totalsSheet: 'Raw Data Totals', // one-mark worksheet: COUNTD(WO) + MIN/MAX of each date, uncapped.  It is what
-                                    // lets the count say "1,000 of 12,345" and the sliders span the WHOLE filtered
-                                    // range instead of just the preview.  '' = fall back to the preview's own span.
+    totalsSheet: '',                // name of an uncapped one-mark worksheet carrying COUNTD(WO) + MIN/MAX of each
+                                    // date.  When it exists the count can say "1,000 of 12,345" and the sliders can
+                                    // span the WHOLE filtered range.  Empty (v39) = fall back to the loaded rows:
+                                    // Desktop would not accept a hand-built one, so this waits for a witnessed card.
     // Tableau's summary data hands columns back as dimensions A-Z then measures, NOT in the worksheet's shelf order.
     // This is the order we want left to right; anything not listed keeps its place after the listed ones.
     columns: 'WO, WDF, WDB, WDF Region, WDB Region, SOT, KC Level, RTK/RTF, Service Type, WO Received Date, Asset Name, Serial Number, Product Line, WO Completed Date, Is Rerepair, Total Transit Time (Days), SACI Upgrade, Product Name, Asset Manufacturer, On Hold Time (Hours), Target TAT (Days), Scheduled Date, Ship to Service Account, Deliverable Services, Workcenter Calibration, Workcenter Repair, Parent Work Order, Net TAT (Days), WDB Country, WDF Country, WDB TAT (Days), WO Delay Reason, Requested Date, Status, Product Description, Product Category, Fiscal Year, Display Quarter, WO Closed Date'
