@@ -1,8 +1,10 @@
 /* TAT Raw Data Table -- a Tableau dashboard extension that renders one worksheet as an interactive table:
  * per-column filters (text, and a date range slider for date columns), a table-wide search box, sortable columns,
  * paging, and export to Excel with REAL data types (dates as Excel dates, numbers as numbers, clean headers) or CSV.
- * The export honours whatever is filtered/searched on screen; "All rows" re-reads the full filtered data set from
- * Tableau first (it flips the dashboard's row-cap parameter, reads, and puts it back).
+ * The worksheet behind it is uncapped, so the table loads only `previewRows` of it for browsing (the Preview box) and
+ * reports the true total; the export with "All rows" ticked re-reads every row the dashboard filters return and applies
+ * the same table filters/sort to it.  (`param`/`paramAll` remain for a workbook that still caps rows with a parameter:
+ * set them and the export flips that parameter for the read, then puts it back.)
  * Libraries: Tableau Extensions API 1.17 (Tableau's own @tableau/tabextsandbox package), SheetJS 0.18.5 (Apache-2.0).
  * The conversion / shaping / export functions are pure so they can be unit-tested in Node (see selftest.js).
  */
@@ -14,14 +16,15 @@
     filename: 'TAT Raw Data',       // file name prefix; a timestamp is appended
     dateFormat: 'dd/mm/yyyy',       // Excel number format for date columns
     dateTimeFormat: 'dd/mm/yyyy hh:mm',
-    label: 'Excel',             // text on the green export button
-    param: 'Rows shown',            // parameter that caps how many rows the worksheet returns
-    paramAll: '10000000',           // its "all rows" value
+    label: 'Excel',                 // text on the green export button
+    param: '',                      // legacy: a parameter capping the worksheet. Empty = the worksheet is uncapped.
+    paramAll: '',                   // its "all rows" value
     allRows: 'true',                // default state of the "All rows" checkbox
-    pageSize: '100',
+    pageSize: '100',                // rows per page on screen
+    previewRows: '1000',            // rows LOADED from Tableau for browsing ('0' = load everything)
     // Tableau's summary data hands columns back as dimensions A-Z then measures, NOT in the worksheet's shelf order.
     // This is the order we want left to right; anything not listed keeps its place after the listed ones.
-    columns: 'WO, Product Name, Product Description, Product Category, Deliverable Services, Service Level Clean, Ship to Service Account, WDF Region, WDF Hub, WDB Region, WDB Hub, Transhipment, RTK/RTF, SOT, Status, Net TAT (Days), Target TAT (Days), Parts Delay, WO Delay Reason, Fiscal Year, Display Quarter, WO Created Date, WO Received Date, WO Closed Date'
+    columns: 'WO, WDF, WDB, WDF Region, WDB Region, SOT, KC Level, RTK/RTF, Service Type, WO Received Date, Asset Name, Serial Number, Product Line, WO Completed Date, Is Rerepair, Total Transit Time (Days), SACI Upgrade, Product Name, Asset Manufacturer, On Hold Time (Hours), Target TAT (Days), Scheduled Date, Ship to Service Account, Deliverable Services, Workcenter Calibration, Workcenter Repair, Parent Work Order, Net TAT (Days), WDB Country, WDF Country, WDB TAT (Days), WO Delay Reason, Requested Date, Status, Product Description, Product Category, Fiscal Year, Display Quarter, WO Closed Date'
   };
 
   // ---------------------------------------------------------------- pure helpers
@@ -193,7 +196,7 @@
   // ================================================================ browser / Tableau side
   var $ = function (id) { return document.getElementById(id); };
   var cfg = {}, S = { shaped: null, filters: [], search: '', sortCol: -1, sortDir: 0, page: 1, pageSize: 100,
-                      view: [], bounds: [], busy: false, suppress: false, sheet: null, cap: 0, capLabel: '' };
+                      view: [], bounds: [], busy: false, suppress: false, sheet: null, total: 0, preview: 1000 };
 
   function setting(k) { var v = tableau.extensions.settings.get(k); return (v === undefined || v === null || v === '') ? DEFAULTS[k] : v; }
   function status(msg, kind) { var el = $('status'); el.textContent = msg || ''; el.className = kind || ''; }
@@ -209,23 +212,31 @@
     for (var i = 0; i < ws.length; i++) if (ws[i].name === cfg.sheet) return ws[i];
     throw new Error('Worksheet "' + cfg.sheet + '" is not on this dashboard');
   }
-  function readAll(sheet, onProgress) {
+  /** read the worksheet's summary data.  limit = how many rows to actually transfer (0 = all of them); the reader
+   *  reports the full row count up front, so a 1,000-row preview stays cheap no matter how big the result set is. */
+  function readAll(sheet, limit, onProgress) {
     var opts = { ignoreSelection: true };
     if (typeof sheet.getSummaryDataReaderAsync !== 'function') {
-      return sheet.getSummaryDataAsync(opts).then(function (t) { return { columns: t.columns, rows: t.data }; });
+      return sheet.getSummaryDataAsync(opts).then(function (t) {
+        return { columns: t.columns, rows: limit ? t.data.slice(0, limit) : t.data, total: t.data.length };
+      });
     }
-    return sheet.getSummaryDataReaderAsync(10000, opts).then(function (reader) {
-      var columns = null, rows = [], pages = reader.pageCount, chain = Promise.resolve();
+    var page = limit ? Math.min(limit, 10000) : 10000;
+    return sheet.getSummaryDataReaderAsync(page, opts).then(function (reader) {
+      var columns = null, rows = [], total = reader.totalRowCount, chain = Promise.resolve();
+      var need = limit ? limit : Infinity, pages = Math.min(reader.pageCount, limit ? Math.ceil(limit / page) : reader.pageCount);
       for (var p = 0; p < pages; p++) (function (p) {
         chain = chain.then(function () {
           return reader.getPageAsync(p).then(function (t) {
             if (!columns) columns = t.columns;
-            for (var i = 0; i < t.data.length; i++) rows.push(t.data[i]);
-            if (onProgress) onProgress(rows.length, reader.totalRowCount);
+            for (var i = 0; i < t.data.length && rows.length < need; i++) rows.push(t.data[i]);
+            if (onProgress) onProgress(rows.length, total);
           });
         });
       })(p);
-      return chain.then(function () { return reader.releaseAsync().then(function () { return { columns: columns || [], rows: rows }; }); });
+      return chain.then(function () {
+        return reader.releaseAsync().then(function () { return { columns: columns || [], rows: rows, total: total }; });
+      });
     });
   }
   function countRows(sheet) {
@@ -345,15 +356,14 @@
     $('pageinfo').textContent = S.view.length ? 'Page ' + S.page + ' of ' + pages : '–';
     $('first').disabled = $('prev').disabled = S.busy || S.page <= 1;
     $('next').disabled = $('last').disabled = S.busy || S.page >= pages;
-    var total = S.shaped ? S.shaped.display.length : 0;
-    var atCap = S.cap > 0 && total >= S.cap;
-    $('count').innerHTML = (S.view.length === total ? '<b>' + total.toLocaleString() + '</b> rows'
-                                                    : '<b>' + S.view.length.toLocaleString() + '</b> of ' + total.toLocaleString() + ' rows')
-                         + (atCap ? ' <span class="cap">limit reached</span>' : '');
-    $('count').title = total.toLocaleString() + ' row' + (total === 1 ? '' : 's') + ' loaded from "' + cfg.sheet
-                     + '" with the dashboard filters as they are now'
-                     + (S.capLabel ? '\n"' + cfg.param + '" is set to ' + S.capLabel
-                                   + (atCap ? ' - there may be more rows than this' : ' - this is everything those filters return') : '');
+    var loaded = S.shaped ? S.shaped.display.length : 0, all = Math.max(S.total, loaded), partial = loaded < all;
+    $('count').innerHTML = (S.view.length === loaded ? '<b>' + loaded.toLocaleString() + '</b> rows'
+                                                     : '<b>' + S.view.length.toLocaleString() + '</b> of ' + loaded.toLocaleString() + ' rows')
+                         + (partial ? ' <span class="cap">preview of ' + all.toLocaleString() + '</span>' : '');
+    $('count').title = partial
+      ? loaded.toLocaleString() + ' of ' + all.toLocaleString() + ' rows loaded for browsing (the Preview box sets this).\n'
+        + 'Export with "All rows" ticked sends every one of the ' + all.toLocaleString() + ' rows the dashboard filters return.'
+      : all.toLocaleString() + ' row' + (all === 1 ? '' : 's') + ' - everything the dashboard filters return, all loaded.';
     var active = S.search || S.filters.some(function (f) { return f.text || f.from !== null && f.from !== undefined || f.to !== null && f.to !== undefined; });
     $('clear').hidden = !active;
   }
@@ -364,25 +374,14 @@
   }
 
   // ---------------------------------------------------------------- load + events
-  // what "Rows shown" is set to right now, so the row count can say whether it is the limiter
-  function readCap() {
-    try {
-      return tableau.extensions.dashboardContent.dashboard.findParameterAsync(cfg.param).then(function (p) {
-        var v = p && p.currentValue;
-        S.cap = v && !isNaN(Number(v.value)) ? Number(v.value) : 0;
-        S.capLabel = v ? (v.formattedValue || String(v.value)) : '';
-      }, function () { S.cap = 0; S.capLabel = ''; });
-    } catch (e) { S.cap = 0; S.capLabel = ''; return Promise.resolve(); }
-  }
-
   function load(first) {
     if (S.busy) return Promise.resolve();
     var keep = $('status').className === 'ok' ? $('status').textContent : null;   // don't wipe an export confirmation
     busy(true); status('Reading rows…', 'warn');
-    return readCap()
-      .then(function () { return readAll(S.sheet, function (n, t) { status('Reading rows… ' + n.toLocaleString() + (t ? ' of ' + t.toLocaleString() : ''), 'warn'); }); })
+    return readAll(S.sheet, S.preview, function (n, t) { status('Reading rows… ' + n.toLocaleString() + (t ? ' of ' + t.toLocaleString() : ''), 'warn'); })
       .then(function (data) {
         var was = S.shaped ? S.shaped.header.join('') : null;
+        S.total = data.total === undefined ? data.rows.length : data.total;
         S.shaped = shape(data.columns, data.rows, cfg);
         S.bounds = bounds(S.shaped);
         if (was !== S.shaped.header.join('')) {                 // columns changed -> fresh filters
@@ -408,13 +407,13 @@
     var t0 = Date.now(), name = cfg.filename + ' ' + stamp();
     var work = function () {
       if (!$('all').checked) return Promise.resolve(subset(S.shaped, S.view));
-      return readAll(S.sheet, function (n, t) { status('Reading all rows… ' + n.toLocaleString() + (t ? ' of ' + t.toLocaleString() : ''), 'warn'); })
+      return readAll(S.sheet, 0, function (n, t) { status('Reading all rows… ' + n.toLocaleString() + (t ? ' of ' + t.toLocaleString() : ''), 'warn'); })
         .then(function (data) {
           var full = shape(data.columns, data.rows, cfg);
           return subset(full, sortIndices(full, filterIndices(full, S.filters, S.search), S.sortCol, S.sortDir));
         });
     };
-    var job = $('all').checked ? withAllRows(S.sheet, work) : work();
+    var job = ($('all').checked && cfg.param) ? withAllRows(S.sheet, work) : work();
     job.then(function (out) {
       status('Building the file… (' + out.cells.length.toLocaleString() + ' rows)', 'warn');
       return new Promise(function (r) { setTimeout(r, 30); }).then(function () {
@@ -473,6 +472,7 @@
     $('next').addEventListener('click', function () { S.page++; renderBody(); renderPager(); });
     $('last').addEventListener('click', function () { S.page = Math.max(1, Math.ceil(S.view.length / S.pageSize)); renderBody(); renderPager(); });
     $('size').addEventListener('change', function () { S.pageSize = +this.value; S.page = 1; renderBody(); renderPager(); });
+    $('preview').addEventListener('change', function () { S.preview = +this.value; load(false); });
     $('xl').addEventListener('click', function () { exportFile(false); });
     $('csv').addEventListener('click', function () { exportFile(true); });
   }
@@ -484,6 +484,9 @@
       started = true;
       Object.keys(DEFAULTS).forEach(function (k) { cfg[k] = setting(k); });
       S.pageSize = Number(cfg.pageSize) || 100;
+      S.preview = Math.max(0, Number(cfg.previewRows) || 0);
+      $('preview').value = String(S.preview);
+      if ($('preview').selectedIndex < 0) $('preview').insertAdjacentHTML('afterbegin', '<option selected value="' + S.preview + '">' + S.preview.toLocaleString() + '</option>');
       $('size').value = String(S.pageSize);
       if (!Array.prototype.some.call($('size').options, function (o) { return o.value === String(S.pageSize); })) {
         $('size').insertAdjacentHTML('afterbegin', '<option selected>' + S.pageSize + '</option>');
