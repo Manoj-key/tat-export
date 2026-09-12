@@ -95,13 +95,13 @@
       <button id="clear" title="Remove every filter and the search on this table" hidden>Clear filters</button>
       <div id="spacer"></div>
       <div id="status">Starting…</div>
-      <label class="chk" title="How many rows to load from Tableau for browsing. The export is not limited by this.">Preview
+      <label class="chk" title="How many work orders Tableau builds for browsing - the worst-aging ones first. The export is not limited by this.">Preview
         <select id="preview">
           <option value="1000">1,000</option>
           <option value="2500">2,500</option>
           <option value="5000">5,000</option>
           <option value="10000">10,000</option>
-          <option value="0">All rows</option>
+          <option value="10000000">All rows</option>
         </select>
       </label>
       <label class="chk" title="Export every row the dashboard filters return, not just the ones loaded above"><input id="all" type="checkbox" checked> All rows</label>

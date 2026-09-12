@@ -1,10 +1,10 @@
 /* TAT Raw Data Table -- a Tableau dashboard extension that renders one worksheet as an interactive table:
  * per-column filters (text, and a date range slider for date columns), a table-wide search box, sortable columns,
  * paging, and export to Excel with REAL data types (dates as Excel dates, numbers as numbers, clean headers) or CSV.
- * The worksheet behind it is uncapped, so the table loads only `previewRows` of it for browsing (the Preview box) and
- * reports the true total; the export with "All rows" ticked re-reads every row the dashboard filters return and applies
- * the same table filters/sort to it.  (`param`/`paramAll` remain for a workbook that still caps rows with a parameter:
- * set them and the export flips that parameter for the read, then puts it back.)
+ * Speed: the worksheet caps itself with the `param` parameter (a Top-N on the worst-aging work orders, taken AFTER the
+ * page's context filters), and the Preview box moves that cap -- so Tableau only ever builds the rows being browsed.
+ * The export is not limited by it: "All rows" flips the parameter to `paramAll`, reads everything the dashboard filters
+ * return, re-applies the table's own filters and sort, and puts the parameter back.
  * Libraries: Tableau Extensions API 1.17 (Tableau's own @tableau/tabextsandbox package), SheetJS 0.18.5 (Apache-2.0).
  * The conversion / shaping / export functions are pure so they can be unit-tested in Node (see selftest.js).
  */
@@ -17,11 +17,13 @@
     dateFormat: 'dd/mm/yyyy',       // Excel number format for date columns
     dateTimeFormat: 'dd/mm/yyyy hh:mm',
     label: 'Excel',                 // text on the green export button
-    param: '',                      // legacy: a parameter capping the worksheet. Empty = the worksheet is uncapped.
-    paramAll: '',                   // its "all rows" value
+    param: 'Rows shown',            // the worksheet's row cap. The Preview box sets it, so Tableau only builds that many.
+    paramAll: '10000000',           // its "all rows" value, used for the export read
     allRows: 'true',                // default state of the "All rows" checkbox
     pageSize: '100',                // rows per page on screen
-    previewRows: '1000',            // rows LOADED from Tableau for browsing ('0' = load everything)
+    previewRows: '1000',            // preview size: the cap the page opens on ('0'/paramAll = no cap)
+    sortBy: 'Net TAT (Days)',       // column the table opens sorted on ('' = the order Tableau returns)
+    sortDir: 'desc',
     // Tableau's summary data hands columns back as dimensions A-Z then measures, NOT in the worksheet's shelf order.
     // This is the order we want left to right; anything not listed keeps its place after the listed ones.
     columns: 'WO, WDF, WDB, WDF Region, WDB Region, SOT, KC Level, RTK/RTF, Service Type, WO Received Date, Asset Name, Serial Number, Product Line, WO Completed Date, Is Rerepair, Total Transit Time (Days), SACI Upgrade, Product Name, Asset Manufacturer, On Hold Time (Hours), Target TAT (Days), Scheduled Date, Ship to Service Account, Deliverable Services, Workcenter Calibration, Workcenter Repair, Parent Work Order, Net TAT (Days), WDB Country, WDF Country, WDB TAT (Days), WO Delay Reason, Requested Date, Status, Product Description, Product Category, Fiscal Year, Display Quarter, WO Closed Date'
@@ -196,7 +198,7 @@
   // ================================================================ browser / Tableau side
   var $ = function (id) { return document.getElementById(id); };
   var cfg = {}, S = { shaped: null, filters: [], search: '', sortCol: -1, sortDir: 0, page: 1, pageSize: 100,
-                      view: [], bounds: [], busy: false, suppress: false, sheet: null, total: 0, preview: 1000 };
+                      view: [], bounds: [], busy: false, suppress: false, sheet: null, total: 0, preview: 1000, sorted: false };
 
   function setting(k) { var v = tableau.extensions.settings.get(k); return (v === undefined || v === null || v === '') ? DEFAULTS[k] : v; }
   function status(msg, kind) { var el = $('status'); el.textContent = msg || ''; el.className = kind || ''; }
@@ -356,14 +358,17 @@
     $('pageinfo').textContent = S.view.length ? 'Page ' + S.page + ' of ' + pages : '–';
     $('first').disabled = $('prev').disabled = S.busy || S.page <= 1;
     $('next').disabled = $('last').disabled = S.busy || S.page >= pages;
-    var loaded = S.shaped ? S.shaped.display.length : 0, all = Math.max(S.total, loaded), partial = loaded < all;
+    var loaded = S.shaped ? S.shaped.display.length : 0;
+    var capped = S.preview > 0 && S.preview < Number(cfg.paramAll || Infinity) && loaded >= S.preview;
     $('count').innerHTML = (S.view.length === loaded ? '<b>' + loaded.toLocaleString() + '</b> rows'
                                                      : '<b>' + S.view.length.toLocaleString() + '</b> of ' + loaded.toLocaleString() + ' rows')
-                         + (partial ? ' <span class="cap">preview of ' + all.toLocaleString() + '</span>' : '');
-    $('count').title = partial
-      ? loaded.toLocaleString() + ' of ' + all.toLocaleString() + ' rows loaded for browsing (the Preview box sets this).\n'
-        + 'Export with "All rows" ticked sends every one of the ' + all.toLocaleString() + ' rows the dashboard filters return.'
-      : all.toLocaleString() + ' row' + (all === 1 ? '' : 's') + ' - everything the dashboard filters return, all loaded.';
+                         + (capped && cfg.sortBy ? ' <span class="cap">top ' + loaded.toLocaleString() + ' by ' + esc(cfg.sortBy) + '</span>'
+                                                 : capped ? ' <span class="cap">preview</span>' : '');
+    $('count').title = capped
+      ? 'Showing the ' + loaded.toLocaleString() + ' work orders with the largest ' + (cfg.sortBy || 'value')
+        + ' out of everything your dashboard filters return.\nPick a bigger Preview size to browse more.\n'
+        + 'The export is not limited by this: with "All rows" ticked you get every row your filters return.'
+      : loaded.toLocaleString() + ' row' + (loaded === 1 ? '' : 's') + ' - everything the dashboard filters return.';
     var active = S.search || S.filters.some(function (f) { return f.text || f.from !== null && f.from !== undefined || f.to !== null && f.to !== undefined; });
     $('clear').hidden = !active;
   }
@@ -374,11 +379,32 @@
   }
 
   // ---------------------------------------------------------------- load + events
+  /** the Preview box: move the worksheet's own cap, so Tableau only ever builds that many rows */
+  function setPreview(n) {
+    // a change made while a read is in flight must not be dropped -- come back to it
+    if (S.busy) { setTimeout(function () { setPreview(n); }, 250); return Promise.resolve(); }
+    S.preview = n;
+    if (!cfg.param) return load(false);                       // no cap parameter -> we just transfer fewer rows
+    busy(true); status('Loading ' + (n ? n.toLocaleString() + ' rows' : 'all rows') + '…', 'warn');
+    S.suppress = true;
+    var dash = tableau.extensions.dashboardContent.dashboard;
+    return dash.findParameterAsync(cfg.param).then(function (p) {
+      if (!p) return null;
+      return setParam(p, String(n || cfg.paramAll));
+    }).then(function () {
+      return new Promise(function (r) { setTimeout(r, 400); });   // let the worksheet re-query
+    }).then(function () {
+      S.suppress = false; busy(false); return load(false);
+    }, function (e) {
+      S.suppress = false; busy(false); status('Could not change the preview size: ' + (e && e.message ? e.message : e), 'error');
+    });
+  }
+
   function load(first) {
     if (S.busy) return Promise.resolve();
     var keep = $('status').className === 'ok' ? $('status').textContent : null;   // don't wipe an export confirmation
     busy(true); status('Reading rows…', 'warn');
-    return readAll(S.sheet, S.preview, function (n, t) { status('Reading rows… ' + n.toLocaleString() + (t ? ' of ' + t.toLocaleString() : ''), 'warn'); })
+    return readAll(S.sheet, S.preview >= Number(cfg.paramAll || Infinity) ? 0 : S.preview, function (n, t) { status('Reading rows… ' + n.toLocaleString() + (t ? ' of ' + t.toLocaleString() : ''), 'warn'); })
       .then(function (data) {
         var was = S.shaped ? S.shaped.header.join('') : null;
         S.total = data.total === undefined ? data.rows.length : data.total;
@@ -393,6 +419,11 @@
           if (f.from !== null && f.from !== undefined) f.from = Math.max(b.lo, Math.min(f.from, b.hi));
           if (f.to !== null && f.to !== undefined) f.to = Math.max(b.lo, Math.min(f.to, b.hi));
         });
+        if (!S.sorted && cfg.sortBy) {                      // open on the worst-aging rows
+          var c = S.shaped.header.indexOf(cfg.sortBy);
+          if (c >= 0) { S.sortCol = c; S.sortDir = String(cfg.sortDir).toLowerCase() === 'asc' ? 1 : -1; }
+          S.sorted = true;
+        }
         renderHead(); applyView(true);
         status(keep || (first ? '' : 'Updated'), keep || !first ? 'ok' : '');
         if (!keep && !first) setTimeout(function () { if ($('status').textContent === 'Updated') status(''); }, 2500);
@@ -472,7 +503,7 @@
     $('next').addEventListener('click', function () { S.page++; renderBody(); renderPager(); });
     $('last').addEventListener('click', function () { S.page = Math.max(1, Math.ceil(S.view.length / S.pageSize)); renderBody(); renderPager(); });
     $('size').addEventListener('change', function () { S.pageSize = +this.value; S.page = 1; renderBody(); renderPager(); });
-    $('preview').addEventListener('change', function () { S.preview = +this.value; load(false); });
+    $('preview').addEventListener('change', function () { setPreview(+this.value); });
     $('xl').addEventListener('click', function () { exportFile(false); });
     $('csv').addEventListener('click', function () { exportFile(true); });
   }
