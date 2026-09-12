@@ -1,0 +1,1167 @@
+/*! ../../../ApiShared */
+
+/*! ../../ApiShared */
+
+/*! ../../DataSource */
+
+/*! ../../EnumMappings/ExternalToInternalEnumMappings */
+
+/*! ../../EnumMappings/InternalToExternalEnumMappings */
+
+/*! ../../Field */
+
+/*! ../../Impl/CustomViewImpl */
+
+/*! ../../Impl/DataSourceImpl */
+
+/*! ../../Impl/FieldImpl */
+
+/*! ../../Impl/ParameterImpl */
+
+/*! ../../Models/AccessibilityModels */
+
+/*! ../../Models/FilterModels */
+
+/*! ../../Models/GetDataModels */
+
+/*! ../../Models/GetDataTableReaderModels */
+
+/*! ../../Models/SelectionModels */
+
+/*! ../../TableauError */
+
+/*! ../../Utils/DataValueFactory */
+
+/*! ../../Utils/EnumConverter */
+
+/*! ../../Utils/ErrorHelpers */
+
+/*! ../../Utils/ExportHelpers */
+
+/*! ../../Utils/Param */
+
+/*! ../ConnectionSummary */
+
+/*! ../DataSource */
+
+/*! ../EnumMappings/InternalToExternalEnumMappings */
+
+/*! ../Events/DashboardLayoutChangedEvent */
+
+/*! ../Events/FilterChangedEvent */
+
+/*! ../Events/MarksSelectedEvent */
+
+/*! ../Events/ParameterChangedEvent */
+
+/*! ../Events/SummaryDataChangedEvent */
+
+/*! ../Events/TableauEvent */
+
+/*! ../Events/WorkbookFormattingChangedEvent */
+
+/*! ../Events/WorksheetFormattingChangedEvent */
+
+/*! ../Field */
+
+/*! ../GetDataService */
+
+/*! ../Impl/ConnectedServer */
+
+/*! ../JsApiInternalContract */
+
+/*! ../LogicalTable */
+
+/*! ../Models/Dashboard */
+
+/*! ../Models/GetDataModels */
+
+/*! ../Models/Parameter */
+
+/*! ../Models/Workbook */
+
+/*! ../Models/Worksheet */
+
+/*! ../Namespaces/DashboardContent */
+
+/*! ../Namespaces/Environment */
+
+/*! ../Namespaces/Settings */
+
+/*! ../Namespaces/UI */
+
+/*! ../Namespaces/WorkbookFormattingEnvUtil */
+
+/*! ../Namespaces/WorksheetContent */
+
+/*! ../Point */
+
+/*! ../Services/GetDataService */
+
+/*! ../Services/RegisterAllExtensionsServices */
+
+/*! ../Services/ServiceRegistry */
+
+/*! ../Services/ServiceRegistryUtil */
+
+/*! ../TableSummary */
+
+/*! ../TableauError */
+
+/*! ../Utils/DataValueFactory */
+
+/*! ../Utils/EnumConverter */
+
+/*! ../Utils/ErrorHelpers */
+
+/*! ../Utils/Param */
+
+/*! ../Utils/SheetUtils */
+
+/*! ../Utils/ShortLivedDeferred */
+
+/*! ../VersionConverterFactory */
+
+/*! ../contract/Notifications */
+
+/*! ../internal-contract-version.json */
+
+/*! ./ApiShared/ApiVersion */
+
+/*! ./ApiShared/CrossFrame/CrossFrameBootstrap */
+
+/*! ./ApiShared/CrossFrame/CrossFrameDispatcher */
+
+/*! ./ApiShared/DataSource */
+
+/*! ./ApiShared/EnumMappings/ExternalToInternalEnumMappings */
+
+/*! ./ApiShared/EnumMappings/InternalToExternalEnumMappings */
+
+/*! ./ApiShared/EventListenerManager */
+
+/*! ./ApiShared/Field */
+
+/*! ./ApiShared/Impl/CustomViewImpl */
+
+/*! ./ApiShared/Impl/DashboardImpl */
+
+/*! ./ApiShared/Impl/DashboardObjectImpl */
+
+/*! ./ApiShared/Impl/DataSourceImpl */
+
+/*! ./ApiShared/Impl/ParameterImpl */
+
+/*! ./ApiShared/Impl/SheetImpl */
+
+/*! ./ApiShared/Impl/SheetInfoImpl */
+
+/*! ./ApiShared/Impl/SingleEventManagerImpl */
+
+/*! ./ApiShared/Impl/StoryImpl */
+
+/*! ./ApiShared/Impl/StoryPointImpl */
+
+/*! ./ApiShared/Impl/StoryPointInfoImpl */
+
+/*! ./ApiShared/Impl/WorkbookImpl */
+
+/*! ./ApiShared/Impl/WorksheetImpl */
+
+/*! ./ApiShared/Point */
+
+/*! ./ApiShared/Services/RegisterAllSharedServices */
+
+/*! ./ApiShared/Services/ServiceRegistry */
+
+/*! ./ApiShared/Services/impl/ClientInfoServiceImpl */
+
+/*! ./ApiShared/Services/impl/NotificationServiceImpl */
+
+/*! ./ApiShared/Services/impl/NotificationServiceImplBase */
+
+/*! ./ApiShared/Services/impl/ServiceImplBase */
+
+/*! ./ApiShared/Services/impl/SizeServiceImpl */
+
+/*! ./ApiShared/Services/impl/StoryActivationServiceImpl */
+
+/*! ./ApiShared/TableauError */
+
+/*! ./ApiShared/Utils/Deferred */
+
+/*! ./ApiShared/Utils/ErrorHelpers */
+
+/*! ./ApiShared/Utils/ExportHelpers */
+
+/*! ./ApiShared/Utils/SheetUtils */
+
+/*! ./ApiShared/VersionNumber */
+
+/*! ./BentonSansFontNameConstants */
+
+/*! ./CrossFrameDispatcher */
+
+/*! ./CrossFramePreparedMessage */
+
+/*! ./Dashboard */
+
+/*! ./DashboardImpl */
+
+/*! ./DashboardObject */
+
+/*! ./DashboardObjectImpl */
+
+/*! ./DataSourceImpl */
+
+/*! ./Deferred */
+
+/*! ./EmbeddingApiExternalContract */
+
+/*! ./Enums */
+
+/*! ./ErrorHelpers */
+
+/*! ./ExtensionWorkbookImpl */
+
+/*! ./ExtensionsApi/Impl/ExtensionsImpl */
+
+/*! ./ExtensionsApi/Namespaces/Extensions */
+
+/*! ./ExtensionsApiExternalContract */
+
+/*! ./ExternalContract/Embedding/AskDataInterfaces */
+
+/*! ./ExternalContract/Embedding/Enums */
+
+/*! ./ExternalContract/Embedding/PulseInterfaces */
+
+/*! ./ExternalContract/Embedding/TableauError */
+
+/*! ./ExternalContract/Embedding/VizInterfaces */
+
+/*! ./ExternalContract/Embedding/VizQLDataServiceInterfaces */
+
+/*! ./ExternalContract/Embedding/WebComponentInterfaces */
+
+/*! ./ExternalContract/Extensions/EventInterface */
+
+/*! ./ExternalContract/Extensions/Namespaces/Tableau */
+
+/*! ./ExternalContract/Extensions/Namespaces/UI */
+
+/*! ./ExternalContract/Extensions/ParameterInterfaces */
+
+/*! ./ExternalContract/Extensions/TableauError */
+
+/*! ./ExternalContract/Shared/AnnotationInterfaces */
+
+/*! ./ExternalContract/Shared/DataSourceInterfaces */
+
+/*! ./ExternalContract/Shared/DataTableInterfaces */
+
+/*! ./ExternalContract/Shared/Enums */
+
+/*! ./ExternalContract/Shared/EnvironmentInterfaces */
+
+/*! ./ExternalContract/Shared/FilterInterfaces */
+
+/*! ./ExternalContract/Shared/Namespaces/Tableau */
+
+/*! ./ExternalContract/Shared/SelectionInterfaces */
+
+/*! ./ExternalContract/Shared/SheetInterfaces */
+
+/*! ./ExternalContract/Shared/VisualModelInterface */
+
+/*! ./ExternalContract/Shared/WorkbookFormattingInterfaces */
+
+/*! ./ExternalIdentityVersionConverter */
+
+/*! ./ExternalStackingVersionConverter */
+
+/*! ./FieldImpl */
+
+/*! ./IdentityVersionConverter */
+
+/*! ./Impl/InitializationServiceImpl */
+
+/*! ./Impl/SettingsServiceImpl */
+
+/*! ./Impl/UIServiceImpl */
+
+/*! ./LegacyInternalApiDispatcherHolder */
+
+/*! ./MessageTypeChecks */
+
+/*! ./NotificationServiceImplBase */
+
+/*! ./Param */
+
+/*! ./Parameter */
+
+/*! ./ServiceImplBase */
+
+/*! ./ServiceRegistry */
+
+/*! ./ServiceRegistryUtil */
+
+/*! ./SettingsImpl */
+
+/*! ./SharedApiExternalContract */
+
+/*! ./Sheet */
+
+/*! ./SheetImpl */
+
+/*! ./SheetInfoImpl */
+
+/*! ./StackingVersionConverter */
+
+/*! ./StoryPointImpl */
+
+/*! ./StoryPointInfoImpl */
+
+/*! ./TableauBookFontNameConstants */
+
+/*! ./TableauError */
+
+/*! ./TableauEvent */
+
+/*! ./TableauSheetEvent */
+
+/*! ./TableauWorksheetEvent */
+
+/*! ./UIImpl */
+
+/*! ./VersionNumber */
+
+/*! ./VersionTranslations */
+
+/*! ./VersionedExternalApiDispatcher */
+
+/*! ./WorkbookFormattingEnvUtil */
+
+/*! ./Worksheet */
+
+/*! ./WorksheetImpl */
+
+/*! ./contract/DataTypeConverter */
+
+/*! ./contract/Enums */
+
+/*! ./contract/Models */
+
+/*! ./contract/Notifications */
+
+/*! ./contract/Parameters */
+
+/*! ./contract/Verbs */
+
+/*! ./impl/AccessibilityServiceImpl */
+
+/*! ./impl/AnimationServiceImpl */
+
+/*! ./impl/AnnotationServiceImpl */
+
+/*! ./impl/DataSourceServiceImpl */
+
+/*! ./impl/ExportServiceImpl */
+
+/*! ./impl/ExternalContextMenuServiceImpl */
+
+/*! ./impl/FilterServiceImpl */
+
+/*! ./impl/GetDataServiceImpl */
+
+/*! ./impl/NotificationServiceImpl */
+
+/*! ./impl/ParametersServiceImpl */
+
+/*! ./impl/SelectionServiceImpl */
+
+/*! ./impl/SizeServiceImpl */
+
+/*! ./impl/VisualModelServiceImpl */
+
+/*! ./impl/VizServiceImpl */
+
+/*! ./impl/ZoneServiceImpl */
+
+/*! ./interface/AskDataInterface */
+
+/*! ./interface/InitializationOptions */
+
+/*! ./interface/InternalApiDispatcher */
+
+/*! ./interface/MessageTypes */
+
+/*! ./interface/PulseInterface */
+
+/*! ./interface/VersionNumber */
+
+/*! ./interface/VqlInterface */
+
+/*! ./md5.js */
+
+/*! ./messaging/CrossFrameMessenger */
+
+/*! ./messaging/interface/MessageDispatcher */
+
+/*! ./messaging/interface/MessageListener */
+
+/*! ./messaging/interface/MessageTypes */
+
+/*! ./messaging/interface/Messenger */
+
+/*! ./messaging/interface/PreparedMessage */
+
+/*! ./nil.js */
+
+/*! ./parse.js */
+
+/*! ./regex.js */
+
+/*! ./rng.js */
+
+/*! ./sha1.js */
+
+/*! ./stringify.js */
+
+/*! ./v1.js */
+
+/*! ./v3.js */
+
+/*! ./v35.js */
+
+/*! ./v4.js */
+
+/*! ./v5.js */
+
+/*! ./validate.js */
+
+/*! ./version.js */
+
+/*! ./versioning/InternalContractVersionConverter */
+
+/*! ./versioning/VersionConverterFactory */
+
+/*! ./versioning/external/ExternalContractVersionConverter */
+
+/*! ./versioning/external/ExternalIdentityVersionConverter */
+
+/*! ./versioning/external/ExternalVersionConverterFactory */
+
+/*! @tableau/api-external-contract-js */
+
+/*! @tableau/api-internal-contract-js */
+
+/*! @tableau/api-shared-js */
+
+/*! guid */
+
+/*! uuid */
+
+/*!**********************************!*\
+  !*** ./lib/src/ExtensionsApi.js ***!
+  \**********************************/
+
+/*!***************************************!*\
+  !*** ../../node_modules/guid/guid.js ***!
+  \***************************************/
+
+/*!*********************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared.js ***!
+  \*********************************************/
+
+/*!**********************************************!*\
+  !*** ./lib/src/ExtensionsApi/Impl/UIImpl.js ***!
+  \**********************************************/
+
+/*!***********************************************!*\
+  !*** ./lib/src/ExtensionsApi/Models/Sheet.js ***!
+  \***********************************************/
+
+/*!************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Namespaces/UI.js ***!
+  \************************************************/
+
+/*!**************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Models/Workbook.js ***!
+  \**************************************************/
+
+/*!***************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Field.js ***!
+  \***************************************************/
+
+/*!***************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Point.js ***!
+  \***************************************************/
+
+/*!***************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Models/Dashboard.js ***!
+  \***************************************************/
+
+/*!***************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Models/Parameter.js ***!
+  \***************************************************/
+
+/*!***************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Models/Worksheet.js ***!
+  \***************************************************/
+
+/*!****************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Impl/SettingsImpl.js ***!
+  \****************************************************/
+
+/*!******************************************************!*\
+  !*** ../../node_modules/uuid/dist/esm-browser/v1.js ***!
+  \******************************************************/
+
+/*!******************************************************!*\
+  !*** ../../node_modules/uuid/dist/esm-browser/v3.js ***!
+  \******************************************************/
+
+/*!******************************************************!*\
+  !*** ../../node_modules/uuid/dist/esm-browser/v4.js ***!
+  \******************************************************/
+
+/*!******************************************************!*\
+  !*** ../../node_modules/uuid/dist/esm-browser/v5.js ***!
+  \******************************************************/
+
+/*!******************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Events/TableauEvent.js ***!
+  \******************************************************/
+
+/*!******************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Impl/ExtensionsImpl.js ***!
+  \******************************************************/
+
+/*!******************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Namespaces/Settings.js ***!
+  \******************************************************/
+
+/*!*******************************************************!*\
+  !*** ../../node_modules/uuid/dist/esm-browser/md5.js ***!
+  \*******************************************************/
+
+/*!*******************************************************!*\
+  !*** ../../node_modules/uuid/dist/esm-browser/nil.js ***!
+  \*******************************************************/
+
+/*!*******************************************************!*\
+  !*** ../../node_modules/uuid/dist/esm-browser/rng.js ***!
+  \*******************************************************/
+
+/*!*******************************************************!*\
+  !*** ../../node_modules/uuid/dist/esm-browser/v35.js ***!
+  \*******************************************************/
+
+/*!*******************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Impl/ConnectedServer.js ***!
+  \*******************************************************/
+
+/*!********************************************************!*\
+  !*** ../../node_modules/uuid/dist/esm-browser/sha1.js ***!
+  \********************************************************/
+
+/*!********************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/ApiVersion.js ***!
+  \********************************************************/
+
+/*!********************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/DataSource.js ***!
+  \********************************************************/
+
+/*!********************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Namespaces/Extensions.js ***!
+  \********************************************************/
+
+/*!*********************************************************!*\
+  !*** ../../node_modules/uuid/dist/esm-browser/index.js ***!
+  \*********************************************************/
+
+/*!*********************************************************!*\
+  !*** ../../node_modules/uuid/dist/esm-browser/parse.js ***!
+  \*********************************************************/
+
+/*!*********************************************************!*\
+  !*** ../../node_modules/uuid/dist/esm-browser/regex.js ***!
+  \*********************************************************/
+
+/*!*********************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Utils/Param.js ***!
+  \*********************************************************/
+
+/*!*********************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Models/DashboardObject.js ***!
+  \*********************************************************/
+
+/*!*********************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Namespaces/Environment.js ***!
+  \*********************************************************/
+
+/*!**********************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/LogicalTable.js ***!
+  \**********************************************************/
+
+/*!**********************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/TableSummary.js ***!
+  \**********************************************************/
+
+/*!**********************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/TableauError.js ***!
+  \**********************************************************/
+
+/*!***********************************************************!*\
+  !*** ../../node_modules/uuid/dist/esm-browser/version.js ***!
+  \***********************************************************/
+
+/*!***********************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/VersionNumber.js ***!
+  \***********************************************************/
+
+/*!***********************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Events/TableauSheetEvent.js ***!
+  \***********************************************************/
+
+/*!************************************************************!*\
+  !*** ../../node_modules/uuid/dist/esm-browser/validate.js ***!
+  \************************************************************/
+
+/*!************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Impl/FieldImpl.js ***!
+  \************************************************************/
+
+/*!************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Impl/SheetImpl.js ***!
+  \************************************************************/
+
+/*!************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Impl/StoryImpl.js ***!
+  \************************************************************/
+
+/*!************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Utils/Deferred.js ***!
+  \************************************************************/
+
+/*!************************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Events/FilterChangedEvent.js ***!
+  \************************************************************/
+
+/*!************************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Events/MarksSelectedEvent.js ***!
+  \************************************************************/
+
+/*!*************************************************************!*\
+  !*** ../../node_modules/uuid/dist/esm-browser/stringify.js ***!
+  \*************************************************************/
+
+/*!*************************************************************!*\
+  !*** ../api-internal-contract-js/lib/src/contract/Enums.js ***!
+  \*************************************************************/
+
+/*!*************************************************************!*\
+  !*** ../api-internal-contract-js/lib/src/contract/Verbs.js ***!
+  \*************************************************************/
+
+/*!*************************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Impl/ExtensionWorkbookImpl.js ***!
+  \*************************************************************/
+
+/*!**************************************************************!*\
+  !*** ../api-internal-contract-js/lib/src/contract/Models.js ***!
+  \**************************************************************/
+
+/*!**************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Utils/SheetUtils.js ***!
+  \**************************************************************/
+
+/*!**************************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Namespaces/DashboardContent.js ***!
+  \**************************************************************/
+
+/*!**************************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Namespaces/WorksheetContent.js ***!
+  \**************************************************************/
+
+/*!**************************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Services/Impl/UIServiceImpl.js ***!
+  \**************************************************************/
+
+/*!***************************************************************!*\
+  !*** ../api-external-contract-js/lib/src/ExternalContract.js ***!
+  \***************************************************************/
+
+/*!***************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/ConnectionSummary.js ***!
+  \***************************************************************/
+
+/*!***************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Impl/WorkbookImpl.js ***!
+  \***************************************************************/
+
+/*!***************************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Events/ParameterChangedEvent.js ***!
+  \***************************************************************/
+
+/*!***************************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Events/TableauWorksheetEvent.js ***!
+  \***************************************************************/
+
+/*!***************************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Services/ServiceRegistryUtil.js ***!
+  \***************************************************************/
+
+/*!****************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Impl/DashboardImpl.js ***!
+  \****************************************************************/
+
+/*!****************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Impl/ParameterImpl.js ***!
+  \****************************************************************/
+
+/*!****************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Impl/SheetInfoImpl.js ***!
+  \****************************************************************/
+
+/*!****************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Impl/WorksheetImpl.js ***!
+  \****************************************************************/
+
+/*!****************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Utils/ErrorHelpers.js ***!
+  \****************************************************************/
+
+/*!*****************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Impl/CustomViewImpl.js ***!
+  \*****************************************************************/
+
+/*!*****************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Impl/DataSourceImpl.js ***!
+  \*****************************************************************/
+
+/*!*****************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Impl/StoryPointImpl.js ***!
+  \*****************************************************************/
+
+/*!*****************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Models/FilterModels.js ***!
+  \*****************************************************************/
+
+/*!*****************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Utils/EnumConverter.js ***!
+  \*****************************************************************/
+
+/*!*****************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Utils/ExportHelpers.js ***!
+  \*****************************************************************/
+
+/*!*****************************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Events/SummaryDataChangedEvent.js ***!
+  \*****************************************************************/
+
+/*!******************************************************************!*\
+  !*** ../api-internal-contract-js/lib/src/contract/Parameters.js ***!
+  \******************************************************************/
+
+/*!******************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/EventListenerManager.js ***!
+  \******************************************************************/
+
+/*!******************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Models/GetDataModels.js ***!
+  \******************************************************************/
+
+/*!******************************************************************!*\
+  !*** ../api-shared-js/lib/src/VersionedExternalApiDispatcher.js ***!
+  \******************************************************************/
+
+/*!*******************************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Impl/BentonSansFontNameConstants.js ***!
+  \*******************************************************************/
+
+/*!********************************************************************!*\
+  !*** ../api-internal-contract-js/lib/src/JsApiInternalContract.js ***!
+  \********************************************************************/
+
+/*!********************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Models/SelectionModels.js ***!
+  \********************************************************************/
+
+/*!********************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Utils/DataValueFactory.js ***!
+  \********************************************************************/
+
+/*!********************************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Impl/TableauBookFontNameConstants.js ***!
+  \********************************************************************/
+
+/*!********************************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Services/Impl/SettingsServiceImpl.js ***!
+  \********************************************************************/
+
+/*!*********************************************************************!*\
+  !*** ../api-internal-contract-js/lib/src/contract/Notifications.js ***!
+  \*********************************************************************/
+
+/*!*********************************************************************!*\
+  !*** ../api-internal-contract-js/lib/src/interface/VqlInterface.js ***!
+  \*********************************************************************/
+
+/*!*********************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Impl/StoryPointInfoImpl.js ***!
+  \*********************************************************************/
+
+/*!*********************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Services/GetDataService.js ***!
+  \*********************************************************************/
+
+/*!*********************************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Events/DashboardLayoutChangedEvent.js ***!
+  \*********************************************************************/
+
+/*!**********************************************************************!*\
+  !*** ../api-internal-contract-js/lib/internal-contract-version.json ***!
+  \**********************************************************************/
+
+/*!**********************************************************************!*\
+  !*** ../api-internal-contract-js/lib/src/interface/VersionNumber.js ***!
+  \**********************************************************************/
+
+/*!**********************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Impl/DashboardObjectImpl.js ***!
+  \**********************************************************************/
+
+/*!**********************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Services/ServiceRegistry.js ***!
+  \**********************************************************************/
+
+/*!**********************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Utils/ShortLivedDeferred.js ***!
+  \**********************************************************************/
+
+/*!***********************************************************************!*\
+  !*** ../api-internal-contract-js/lib/src/interface/PulseInterface.js ***!
+  \***********************************************************************/
+
+/*!***********************************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Namespaces/WorkbookFormattingEnvUtil.js ***!
+  \***********************************************************************/
+
+/*!************************************************************************!*\
+  !*** ../api-external-contract-js/lib/src/SharedApiExternalContract.js ***!
+  \************************************************************************/
+
+/*!************************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Models/AccessibilityModels.js ***!
+  \************************************************************************/
+
+/*!************************************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Events/WorkbookFormattingChangedEvent.js ***!
+  \************************************************************************/
+
+/*!*************************************************************************!*\
+  !*** ../api-internal-contract-js/lib/src/contract/DataTypeConverter.js ***!
+  \*************************************************************************/
+
+/*!*************************************************************************!*\
+  !*** ../api-internal-contract-js/lib/src/interface/AskDataInterface.js ***!
+  \*************************************************************************/
+
+/*!*************************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Impl/SingleEventManagerImpl.js ***!
+  \*************************************************************************/
+
+/*!*************************************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Events/WorksheetFormattingChangedEvent.js ***!
+  \*************************************************************************/
+
+/*!*************************************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Impl/LegacyInternalApiDispatcherHolder.js ***!
+  \*************************************************************************/
+
+/*!*************************************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Services/RegisterAllExtensionsServices.js ***!
+  \*************************************************************************/
+
+/*!**************************************************************************!*\
+  !*** ../api-internal-contract-js/lib/src/messaging/MessageTypeChecks.js ***!
+  \**************************************************************************/
+
+/*!**************************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Services/impl/VizServiceImpl.js ***!
+  \**************************************************************************/
+
+/*!**************************************************************************!*\
+  !*** ./lib/src/ExtensionsApi/Services/Impl/InitializationServiceImpl.js ***!
+  \**************************************************************************/
+
+/*!***************************************************************************!*\
+  !*** ../api-external-contract-js/lib/src/EmbeddingApiExternalContract.js ***!
+  \***************************************************************************/
+
+/*!***************************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Services/impl/ServiceImplBase.js ***!
+  \***************************************************************************/
+
+/*!***************************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Services/impl/SizeServiceImpl.js ***!
+  \***************************************************************************/
+
+/*!***************************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Services/impl/ZoneServiceImpl.js ***!
+  \***************************************************************************/
+
+/*!****************************************************************************!*\
+  !*** ../api-external-contract-js/lib/src/ExtensionsApiExternalContract.js ***!
+  \****************************************************************************/
+
+/*!****************************************************************************!*\
+  !*** ../api-external-contract-js/lib/src/ExternalContract/Shared/Enums.js ***!
+  \****************************************************************************/
+
+/*!****************************************************************************!*\
+  !*** ../api-internal-contract-js/lib/src/messaging/CrossFrameMessenger.js ***!
+  \****************************************************************************/
+
+/*!****************************************************************************!*\
+  !*** ../api-internal-contract-js/lib/src/messaging/interface/Messenger.js ***!
+  \****************************************************************************/
+
+/*!****************************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/CrossFrame/CrossFrameBootstrap.js ***!
+  \****************************************************************************/
+
+/*!*****************************************************************************!*\
+  !*** ../api-internal-contract-js/lib/src/versioning/VersionTranslations.js ***!
+  \*****************************************************************************/
+
+/*!*****************************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/CrossFrame/CrossFrameDispatcher.js ***!
+  \*****************************************************************************/
+
+/*!*****************************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Models/GetDataTableReaderModels.js ***!
+  \*****************************************************************************/
+
+/*!*****************************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Services/impl/ExportServiceImpl.js ***!
+  \*****************************************************************************/
+
+/*!*****************************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Services/impl/FilterServiceImpl.js ***!
+  \*****************************************************************************/
+
+/*!******************************************************************************!*\
+  !*** ../api-internal-contract-js/lib/src/interface/InitializationOptions.js ***!
+  \******************************************************************************/
+
+/*!******************************************************************************!*\
+  !*** ../api-internal-contract-js/lib/src/interface/InternalApiDispatcher.js ***!
+  \******************************************************************************/
+
+/*!******************************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Services/impl/GetDataServiceImpl.js ***!
+  \******************************************************************************/
+
+/*!*******************************************************************************!*\
+  !*** ../api-external-contract-js/lib/src/ExternalContract/Embedding/Enums.js ***!
+  \*******************************************************************************/
+
+/*!*******************************************************************************!*\
+  !*** ../api-internal-contract-js/lib/src/messaging/interface/MessageTypes.js ***!
+  \*******************************************************************************/
+
+/*!********************************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Services/RegisterAllSharedServices.js ***!
+  \********************************************************************************/
+
+/*!********************************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Services/impl/AnimationServiceImpl.js ***!
+  \********************************************************************************/
+
+/*!********************************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Services/impl/SelectionServiceImpl.js ***!
+  \********************************************************************************/
+
+/*!*********************************************************************************!*\
+  !*** ../api-internal-contract-js/lib/src/versioning/VersionConverterFactory.js ***!
+  \*********************************************************************************/
+
+/*!*********************************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Services/impl/AnnotationServiceImpl.js ***!
+  \*********************************************************************************/
+
+/*!*********************************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Services/impl/ClientInfoServiceImpl.js ***!
+  \*********************************************************************************/
+
+/*!*********************************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Services/impl/DataSourceServiceImpl.js ***!
+  \*********************************************************************************/
+
+/*!*********************************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Services/impl/ParametersServiceImpl.js ***!
+  \*********************************************************************************/
+
+/*!**********************************************************************************!*\
+  !*** ../api-internal-contract-js/lib/src/messaging/CrossFramePreparedMessage.js ***!
+  \**********************************************************************************/
+
+/*!**********************************************************************************!*\
+  !*** ../api-internal-contract-js/lib/src/messaging/interface/MessageListener.js ***!
+  \**********************************************************************************/
+
+/*!**********************************************************************************!*\
+  !*** ../api-internal-contract-js/lib/src/messaging/interface/PreparedMessage.js ***!
+  \**********************************************************************************/
+
+/*!**********************************************************************************!*\
+  !*** ../api-internal-contract-js/lib/src/versioning/IdentityVersionConverter.js ***!
+  \**********************************************************************************/
+
+/*!**********************************************************************************!*\
+  !*** ../api-internal-contract-js/lib/src/versioning/StackingVersionConverter.js ***!
+  \**********************************************************************************/
+
+/*!**********************************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Services/impl/VisualModelServiceImpl.js ***!
+  \**********************************************************************************/
+
+/*!***********************************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Services/impl/NotificationServiceImpl.js ***!
+  \***********************************************************************************/
+
+/*!************************************************************************************!*\
+  !*** ../api-internal-contract-js/lib/src/messaging/interface/MessageDispatcher.js ***!
+  \************************************************************************************/
+
+/*!************************************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Services/impl/AccessibilityServiceImpl.js ***!
+  \************************************************************************************/
+
+/*!**************************************************************************************!*\
+  !*** ../api-external-contract-js/lib/src/ExternalContract/Embedding/TableauError.js ***!
+  \**************************************************************************************/
+
+/*!**************************************************************************************!*\
+  !*** ../api-external-contract-js/lib/src/ExternalContract/Shared/SheetInterfaces.js ***!
+  \**************************************************************************************/
+
+/*!**************************************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Services/impl/StoryActivationServiceImpl.js ***!
+  \**************************************************************************************/
+
+/*!***************************************************************************************!*\
+  !*** ../api-external-contract-js/lib/src/ExternalContract/Embedding/VizInterfaces.js ***!
+  \***************************************************************************************/
+
+/*!***************************************************************************************!*\
+  !*** ../api-external-contract-js/lib/src/ExternalContract/Extensions/TableauError.js ***!
+  \***************************************************************************************/
+
+/*!***************************************************************************************!*\
+  !*** ../api-external-contract-js/lib/src/ExternalContract/Shared/FilterInterfaces.js ***!
+  \***************************************************************************************/
+
+/*!***************************************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Services/impl/NotificationServiceImplBase.js ***!
+  \***************************************************************************************/
+
+/*!****************************************************************************************!*\
+  !*** ../api-external-contract-js/lib/src/ExternalContract/Extensions/Namespaces/UI.js ***!
+  \****************************************************************************************/
+
+/*!*****************************************************************************************!*\
+  !*** ../api-external-contract-js/lib/src/ExternalContract/Embedding/PulseInterfaces.js ***!
+  \*****************************************************************************************/
+
+/*!*****************************************************************************************!*\
+  !*** ../api-external-contract-js/lib/src/ExternalContract/Extensions/EventInterface.js ***!
+  \*****************************************************************************************/
+
+/*!*****************************************************************************************!*\
+  !*** ../api-external-contract-js/lib/src/ExternalContract/Shared/Namespaces/Tableau.js ***!
+  \*****************************************************************************************/
+
+/*!*****************************************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/EnumMappings/ExternalToInternalEnumMappings.js ***!
+  \*****************************************************************************************/
+
+/*!*****************************************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/EnumMappings/InternalToExternalEnumMappings.js ***!
+  \*****************************************************************************************/
+
+/*!******************************************************************************************!*\
+  !*** ../api-external-contract-js/lib/src/ExternalContract/Shared/DataTableInterfaces.js ***!
+  \******************************************************************************************/
+
+/*!******************************************************************************************!*\
+  !*** ../api-external-contract-js/lib/src/ExternalContract/Shared/SelectionInterfaces.js ***!
+  \******************************************************************************************/
+
+/*!******************************************************************************************!*\
+  !*** ../api-internal-contract-js/lib/src/versioning/InternalContractVersionConverter.js ***!
+  \******************************************************************************************/
+
+/*!******************************************************************************************!*\
+  !*** ../api-shared-js/lib/src/ApiShared/Services/impl/ExternalContextMenuServiceImpl.js ***!
+  \******************************************************************************************/
+
+/*!*******************************************************************************************!*\
+  !*** ../api-external-contract-js/lib/src/ExternalContract/Embedding/AskDataInterfaces.js ***!
+  \*******************************************************************************************/
+
+/*!*******************************************************************************************!*\
+  !*** ../api-external-contract-js/lib/src/ExternalContract/Shared/AnnotationInterfaces.js ***!
+  \*******************************************************************************************/
+
+/*!*******************************************************************************************!*\
+  !*** ../api-external-contract-js/lib/src/ExternalContract/Shared/DataSourceInterfaces.js ***!
+  \*******************************************************************************************/
+
+/*!*******************************************************************************************!*\
+  !*** ../api-external-contract-js/lib/src/ExternalContract/Shared/VisualModelInterface.js ***!
+  \*******************************************************************************************/
+
+/*!********************************************************************************************!*\
+  !*** ../api-external-contract-js/lib/src/ExternalContract/Shared/EnvironmentInterfaces.js ***!
+  \********************************************************************************************/
+
+/*!*********************************************************************************************!*\
+  !*** ../api-external-contract-js/lib/src/ExternalContract/Extensions/Namespaces/Tableau.js ***!
+  \*********************************************************************************************/
+
+/*!**********************************************************************************************!*\
+  !*** ../api-external-contract-js/lib/src/ExternalContract/Extensions/ParameterInterfaces.js ***!
+  \**********************************************************************************************/
+
+/*!************************************************************************************************!*\
+  !*** ../api-external-contract-js/lib/src/ExternalContract/Embedding/WebComponentInterfaces.js ***!
+  \************************************************************************************************/
+
+/*!**************************************************************************************************!*\
+  !*** ../api-internal-contract-js/lib/src/versioning/external/ExternalVersionConverterFactory.js ***!
+  \**************************************************************************************************/
+
+/*!***************************************************************************************************!*\
+  !*** ../api-external-contract-js/lib/src/ExternalContract/Shared/WorkbookFormattingInterfaces.js ***!
+  \***************************************************************************************************/
+
+/*!***************************************************************************************************!*\
+  !*** ../api-internal-contract-js/lib/src/versioning/external/ExternalContractVersionConverter.js ***!
+  \***************************************************************************************************/
+
+/*!***************************************************************************************************!*\
+  !*** ../api-internal-contract-js/lib/src/versioning/external/ExternalIdentityVersionConverter.js ***!
+  \***************************************************************************************************/
+
+/*!***************************************************************************************************!*\
+  !*** ../api-internal-contract-js/lib/src/versioning/external/ExternalStackingVersionConverter.js ***!
+  \***************************************************************************************************/
+
+/*!****************************************************************************************************!*\
+  !*** ../api-external-contract-js/lib/src/ExternalContract/Embedding/VizQLDataServiceInterfaces.js ***!
+  \****************************************************************************************************/

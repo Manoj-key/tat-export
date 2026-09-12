@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TAT Excel Export</title>
+<style>
+  html, body { margin: 0; padding: 0; background: #256072; color: #e6eef0; font-family: "Segoe UI", Segoe, Arial, sans-serif; overflow: hidden; }
+  #wrap { display: flex; flex-direction: column; gap: 3px; padding: 3px 4px; }
+  #row, #row2 { display: flex; align-items: center; gap: 8px; }
+  #row2 { justify-content: space-between; }
+  #go { background: #10353f; color: #fff; border: 0; border-radius: 13px; height: 26px; padding: 0 16px; font: 600 12px "Segoe UI", Segoe, Arial, sans-serif; cursor: pointer; white-space: nowrap; }
+  #go:hover { background: #1c4a58; } #go:disabled { background: #1c4a58; color: #9db6bb; cursor: default; }
+  label { font-size: 10px; color: #a9c7c2; display: flex; align-items: center; gap: 4px; white-space: nowrap; cursor: pointer; }
+  input[type=checkbox] { margin: 0; width: 12px; height: 12px; }
+  #csv { background: none; border: 0; color: #a9c7c2; font-size: 10px; text-decoration: underline; cursor: pointer; padding: 0; }
+  #csv:hover { color: #fff; } #csv:disabled { color: #5f7c82; cursor: default; text-decoration: none; }
+  #status { font-size: 10px; min-height: 12px; flex: 1; color: #a9c7c2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #status.ok { color: #9be0a5; } #status.error { color: #ffb3b3; } #status.warn { color: #f5d9a8; } #status.busy { color: #cfe6ea; }
+</style>
+</head>
+<body>
+  <div id="wrap">
+    <div id="row">
+      <button id="go" type="button">Export to Excel</button>
+      <label title="Export every row in the current filters, not only the 1,000-row preview"><input id="all" type="checkbox" checked> All rows</label>
+    </div>
+    <div id="row2">
+      <div id="status" class="busy">Starting…</div>
+      <button id="csv" type="button" title="Comma-separated file with ISO dates - lighter for very large exports">CSV</button>
+    </div>
+  </div>
+  <script src="lib/tableau.extensions.1.17.0.min.js"></script>
+  <script src="lib/xlsx.full.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
