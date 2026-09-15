@@ -7,7 +7,7 @@
     <author name="Global Ops TAT and SOT Performance team" email="noreply@keysight.com" organization="Keysight Technologies" website="https://www.keysight.com"/>
     <min-api-version>1.10</min-api-version>
     <source-location>
-      <url>https://manoj-key.github.io/tat-export/wo-export/index.html</url>
+      <url>https://manoj-key.github.io/tat-export/woexport/index.html</url>
     </source-location>
     <icon>iVBORw0KGgoAAAANSUhEUgAAAEYAAABGCAYAAABxLuKEAAABsklEQVR4nO2c3VnDMAxFRT9WgblgBZgDVoC5YBh4MiRNrn+wJAv7ntemqe6pbPdzkooQ0sJN6xvuHp6+LAqx5vP9tSlr1cH/VQaiRtKldMBsUkTqMmXFzCglUcoGxcwsJZHLeCpmBSkJlPUgZiUpibPMl9IBq3CdvbgqrQrFAH7ErDyMElsH7BjA7egCPt5e4Gv3j8+OlexhxwAoBkAxAIoBUAyAYgAUA6AYAMUAKAZAMQCKAVAMgGIAFAOgGADFACgGQDEAsz3f3F6u9jks9obNOsZrI9vqc0yHkrUcy/ObzzFWxVtLd5l8tUN4DFO3VUkrjNfc5bpc94byvDLp/jvmr+G8L9fyBx5giJjWb3/Exf1hHVMbdtQdD0OHUin00reBoPAjpYgEECNylDBaikgQMSK/MiJIEQkkRiSOFJFgYiKhtlGlsTGlhUbnqXRMJCkiOvV0i4kmJdFbF+cYAMUAusVEWmK39Nal0jHR5GjUs3vMdvUnULaPHXOOAVAMYCem9TH/mbjOfuiYFeWcZT4dSivJQVnhHLOCnFzG7OQ7s5xStuKqNKOcmkz8Yx1CVPgGx85119DL6g8AAAAASUVORK5CYII=</icon>
   </dashboard-extension>
