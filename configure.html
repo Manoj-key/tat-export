@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KGSO extensions - choose the table</title>
+<style>
+  :root { --ink: #3d3d3d; --ink-strong: #252423; --muted: #787878; --line: #cfd6d9; --teal: #3894a3; --box: #173f4b; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; background: #fff; color: var(--ink);
+               font-family: "Segoe UI", Segoe, Arial, sans-serif; font-size: 12px; }
+  #wrap { display: flex; flex-direction: column; height: 100%; padding: 16px 18px 14px; }
+  h1 { margin: 0 0 10px; font-size: 14px; font-weight: 600; color: var(--ink-strong); }
+  h1 i { display: inline-block; width: 3px; height: 13px; background: #e90029; margin-right: 8px; vertical-align: -2px; }
+  #list { flex: 1; overflow: auto; }
+  label.app { display: grid; grid-template-columns: 18px 1fr; gap: 2px 8px; align-items: start; padding: 8px 10px; margin-bottom: 6px;
+              border: 1px solid var(--line); border-radius: 4px; cursor: pointer; }
+  label.app:hover { background: #f4f7f8; }
+  label.app.on { border-color: var(--teal); background: #eef6f7; }
+  label.app input { margin: 2px 0 0; }
+  label.app b { color: var(--ink-strong); font-weight: 600; }
+  label.app span { grid-column: 2; color: var(--muted); line-height: 1.35; }
+  label.app code { grid-column: 2; color: var(--muted); font-size: 11px; }
+  #msg { min-height: 16px; color: var(--muted); margin: 4px 0 8px; }
+  #msg.error { color: #b3261e; }
+  .row { display: flex; justify-content: flex-end; gap: 8px; }
+  button { font: inherit; height: 28px; padding: 0 14px; border-radius: 3px; border: 1px solid var(--line); background: #fff; color: var(--ink); cursor: pointer; }
+  button.primary { background: var(--box); border-color: var(--box); color: #fff; font-weight: 600; }
+  button:disabled { opacity: .55; cursor: default; }
+</style>
+</head>
+<body>
+  <div id="wrap">
+    <h1><i></i>Which table should this extension show?</h1>
+    <div id="list"></div>
+    <div id="msg"></div>
+    <div class="row"><button id="cancel">Cancel</button><button id="save" class="primary">Save</button></div>
+  </div>
+  <script src="lib/tableau.extensions.1.17.0.min.js"></script>
+  <script src="apps.js"></script>
+  <script src="configure.js"></script>
+</body>
+</html>

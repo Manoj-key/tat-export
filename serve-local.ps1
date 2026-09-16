@@ -1,5 +1,5 @@
-# serve-local.ps1 -- zero-install local web server for the WO Volume Table extension (Windows PowerShell 5+, no admin).
-# Serves THIS folder at http://localhost:8766/ so Tableau Desktop can load the extension.  Loopback only: nothing on the
+# serve-local.ps1 -- zero-install local web server for the KGSO Tableau extensions (Windows PowerShell 5+, no admin).
+# Serves THIS folder (the launcher, tatexport\ and woexport\) at http://localhost:8766/ so Tableau Desktop can load them.  Loopback only: nothing on the
 # network can reach it, and Windows Firewall does not prompt.  Port 8766 -- the TAT extension uses 8765, so both can run.
 # Start it with serve-local.bat (visible window).  -Quiet suppresses the per-request log.
 param([switch]$Quiet)
@@ -15,15 +15,15 @@ catch {
   $mine = $false
   try {
     $probe = New-Object System.Net.WebClient
-    $mine = ($probe.DownloadString("http://localhost:$port/index.html")) -match 'WO Volume Raw Data Table'
+    $mine = ($probe.DownloadString("http://localhost:$port/index.html")) -match 'KGSO Tableau extensions'
   } catch { $mine = $false }
   if ($mine) { Say "Already running at http://localhost:$port/index.html - nothing to do."; if (-not $Quiet) { Start-Sleep 3 }; exit 0 }
-  Write-Host "Port $port is in use by another program. Close it, or tell Manoj so the extension can be moved to another port."
+  Write-Host "Port $port is in use by another program. Close it, or tell the TAT and SOT Performance team so the extensions can be moved to another port."
   if (-not $Quiet) { Start-Sleep 20 }
   exit 1
 }
 
-Say "WO Volume Table is served at http://localhost:$port/index.html"
+Say "KGSO Tableau extensions are served at http://localhost:$port/index.html"
 Say "Folder: $root"
 Say "Leave this window open while you use the dashboard. Press Ctrl+C to stop."
 while ($true) {

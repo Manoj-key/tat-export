@@ -54,7 +54,8 @@
         + 'WDB Country=Country of the work-done-by site;WDB Region=Region of the work-done-by site;'
         + 'RTF / RTK=Return to Factory / Return to Keysight;PL Revised=Product line with WN split into WN-TA, WN-PMPS, WN-NA, WN-DTA;'
         + 'PL Detail=Product family, computed from the product-line mapping;Total Transit (Days)=Days in transit between the WDF and WDB sites',
-    workbook: 'WO Volume Analytics'
+    workbook: 'WO Volume Analytics',
+    app: 'wovolume'                       // read by the KGSO launcher (tat-export/index.html), which picks this app
   };
 
   // ================================================================ pure helpers
@@ -792,7 +793,7 @@
     var payload = { header: out.header, cells: out.cells, sheetName: cfg.sheet, about: about };
     return new Promise(function (resolve, reject) {
       var w = null;
-      try { w = new Worker('worker.js'); } catch (e) { w = null; }
+      try { w = new Worker(((root.KGSO && root.KGSO.base) || '') + 'worker.js'); } catch (e) { w = null; }
       if (!w) return resolve(mainThread());
       var settled = false;
       w.onmessage = function (ev) { settled = true; w.terminate(); if (ev.data && ev.data.error) resolve(mainThread()); else resolve(new Blob([ev.data.buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })); };
@@ -855,11 +856,14 @@
     });
   }
 
-  document.addEventListener('DOMContentLoaded', function () {
-    var started = false;
+  // Boot. Standalone (woexport/index.html) this runs on DOMContentLoaded and initialises the Extensions API itself.
+  // Under the KGSO launcher (tat-export/index.html, one safe-listed URL for every KGSO extension) the page is
+  // already loaded and the API already initialised (window.KGSO.ready), so it boots at once and skips the init.
+  function boot() {
+    var started = false, launched = !!(root.KGSO && root.KGSO.ready);
     skeleton(); status('Starting\u2026', 'warn');
     setTimeout(function () { if (!started) { $('hosting').style.display = 'flex'; } }, 6000);
-    tableau.extensions.initializeAsync().then(function () {
+    (launched ? Promise.resolve() : tableau.extensions.initializeAsync()).then(function () {
       started = true;
       Object.keys(DEFAULTS).forEach(function (k) { cfg[k] = setting(k); });
       S.labels = kv(cfg.filterLabels); S.help = kv(cfg.help);
@@ -884,5 +888,6 @@
         }
       });
     }).catch(function (e) { status('Could not start: ' + (e && e.message ? e.message : e), 'error'); });
-  });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })(typeof window !== 'undefined' ? window : this);
