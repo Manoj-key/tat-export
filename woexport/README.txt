@@ -1,4 +1,4 @@
-WO Volume Table v3 - dashboard extension for the WO Volume Analytics workbook
+WO Volume Table v4 - dashboard extension for the WO Volume Analytics workbook
 ============================================================================
 The two download pages of the workbook are this small web page, loaded by Tableau into the dashboard:
 filter chips with Clear all, the insight band (exact numbers from Tableau's own aggregate sheets),

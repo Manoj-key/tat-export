@@ -447,21 +447,22 @@
     if (cust !== null) bits.push(fmtInt(cust) + ' customers');
     if (topPL) bits.push('top line ' + esc(topPL[0]));
     $('summary').innerHTML = bits.join(' &middot; ');
-    var tiles = '';
+    // Five tiles (four on the service-line page) and three minis share the row fluidly -- see index.html.
+    // The product-line count rides on the "Top product lines" mini instead of a sixth tile.
+    var tiles = '', ofAll = all !== null ? pct(n, all, 0) + ' of ' + fmtInt(all) + ' all time' : '';
     if (wosPage) {
       var comp = S.byS.filter(function (s) { return /^completed$/i.test(s[0]); }).reduce(function (a, s) { return a + s[1]; }, 0);
       var canc = S.byS.filter(function (s) { return /cancel/i.test(s[0]); }).reduce(function (a, s) { return a + s[1]; }, 0);
-      tiles += tile('Service lines', fmtInt(n), '<div class="d">' + (all !== null ? pct(n, all) + ' of ' + fmtInt(all) + ' all time' : '') + '</div>');
+      tiles += tile('Service lines', fmtInt(n), '<div class="d" title="' + esc(ofAll) + '">' + ofAll + '</div>');
       tiles += tile('Work orders', fmtInt(wos), '<div class="d">' + (wos ? (n / wos).toFixed(2) + ' lines per WO' : '') + '</div>');
       tiles += tile('Completed', pct(comp, n), '<div class="d">' + fmtInt(canc) + ' cancelled</div>');
     } else {
-      tiles += tile('Work orders', fmtInt(n), '<div class="d" title="' + (all !== null ? 'of ' + fmtInt(all) + ' work orders all time' : '') + '">' + (all !== null ? pct(n, all) + ' of ' + fmtInt(all) + ' all time' : '') + '</div>');
+      tiles += tile('Work orders', fmtInt(n), '<div class="d" title="' + esc(ofAll) + '">' + ofAll + '</div>');
       tiles += tile('RTK / RTF', rtk === null ? '–' : pct(rtk, n, 1), rtk === null ? '' : '<div class="split"><i style="width:' + (100 * rtk / n) + '%;background:var(--teal)" title="RTK ' + fmtInt(rtk) + '"></i><i style="flex:1;background:var(--indigo)" title="RTF ' + fmtInt(n - rtk) + '"></i></div>');
       tiles += tile('Transhipped', trn === null ? '–' : pct(trn, n), '<div class="d">' + (trn === null ? '' : fmtInt(trn) + ' cross-border') + '</div>');
       tiles += tile('Avg transit', transit === null ? '–' : transit.toFixed(1) + '<small>days</small>', '<div class="d">WDF &rarr; WDB</div>');
     }
     tiles += tile('Customers', fmtInt(cust), '<div class="d">' + (prod !== null ? fmtInt(prod) + ' products' : '') + '</div>');
-    tiles += tile('Product lines', fmtInt(pls), '<div class="d">' + (topPL ? 'top: ' + esc(topPL[0]) + ' &middot; ' + pct(topPL[1], n) : '') + '</div>');
     var minis = '';
     if (S.byQ.length) {
       var qmax = Math.max.apply(null, S.byQ.map(function (q) { return q[1]; })) || 1;
@@ -473,12 +474,12 @@
     var hbars = function (title, data, alt, showPct) {
       if (!data.length) return '';
       var mx = data[0][1] || 1;
-      return '<div class="mini"><div class="l">' + title + '</div><div class="hb">' + data.slice(0, 4).map(function (r) {
-        return '<div title="' + esc(r[0]) + ': ' + fmtInt(r[1]) + '"><em>' + esc(r[0]) + '</em><i class="' + (alt ? 'alt' : '') + '" style="width:' + Math.max(3, 70 * r[1] / mx) + 'px"></i><s>' + (showPct ? pct(r[1], n) : fmtInt(r[1])) + '</s></div>';
+      return '<div class="mini"><div class="l" title="' + esc(title) + '">' + esc(title) + '</div><div class="hb">' + data.slice(0, 4).map(function (r) {
+        return '<div title="' + esc(r[0]) + ': ' + fmtInt(r[1]) + '"><em>' + esc(r[0]) + '</em><span class="tr"><i class="' + (alt ? 'alt' : '') + '" style="width:' + Math.max(4, 100 * r[1] / mx) + '%"></i></span><s>' + (showPct ? pct(r[1], n) : fmtInt(r[1])) + '</s></div>';
       }).join('') + '</div></div>';
     };
     minis += wosPage ? hbars('By status', S.byS, false, true) : hbars('Work done by region', S.byR, false, true);
-    minis += hbars('Top product lines', S.byPL, true, false);
+    minis += hbars(pls !== null ? 'Top of ' + fmtInt(pls) + ' product lines' : 'Top product lines', S.byPL, true, false);
     $('insrow').innerHTML = tiles + minis;
   }
   function setInsights(open) {
@@ -870,7 +871,6 @@
       if (!Array.prototype.some.call($('size').options, function (o) { return o.value === String(S.pageSize); })) $('size').insertAdjacentHTML('afterbegin', '<option selected>' + S.pageSize + '</option>');
       $('dllabel').textContent = cfg.label;
       setInsights(recall('ins', true) !== false);
-      $('footr').textContent = Object.keys(S.help).length ? Object.keys(S.help).length + ' column definitions · hover the ? on a heading' : '';
       S.sheet = sheetByName(cfg.sheet);
       if (!S.sheet) { status('Worksheet "' + cfg.sheet + '" is not on this dashboard', 'error'); return; }
       wire();
